@@ -1,4 +1,4 @@
-# openinp4v README
+# openinperforce README
 
 An extension to open active resource in Perforce Client.
 
