@@ -1,0 +1,110 @@
+{
+    "name": "openinperforce",
+    "displayName": "Open selected resource in Perforce",
+    "icon": "images/icon.png",
+    "description": "VS Code extention to open selected resource (file or folder) in Perforce.",
+    "version": "1.0.5",
+    "license": "SEE LICENCE IN LICENSE",
+    "publisher": "sandipchitale",
+    "author": {
+        "name": "Sandip Chitale"
+    },
+    "maintainers": [
+        "Sandip Chitale <sandipchitale@gmail.com>"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sandipchitale/openinperforce"
+    },
+    "engines": {
+        "vscode": "^1.56.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./out/extension",
+    "activationEvents": [
+    ],
+    "contributes": {
+        "configuration": {
+            "properties": {
+                "openinperforce.p4vcommand": {
+                    "type": "string",
+                    "default": "p4v",
+                    "description": "p4v executable"
+                },
+                "openinperforce.jiraUrlTemplate": {
+                    "type": "string",
+                    "default": "https://jira.opentext.com/browse/{JIRA-ID}",
+                    "description": "URL for JIRA. {JIRA-ID} will be replaced by matched JIRA_ID"
+                },
+                "openinperforce.jiraIdRegexp": {
+                    "type": "string",
+                    "default": "IA-\\d+",
+                    "description": "Regular expression to scan JIRA_ID"
+                }
+            }
+        },
+        "commands": [
+            {
+                "command": "extension.openinperforce",
+                "title": "Open in Perforce Client"
+            },
+            {
+				"command": "extension.openinperforce.changelist.open-jira",
+				"title": "Open JIRA from changelist description"
+			},
+            {
+				"command": "extension.openinperforce.resource",
+				"title": "Open in Perforce Client"
+			},
+            {
+				"command": "extension.openinperforce.resource.copy-depot-path",
+				"title": "Copy depot path"
+			}
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "extension.openinperforce",
+                    "group": "Perforce@1"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "extension.openinperforce",
+                    "group": "Perforce@1"
+                }
+            ],
+            "scm/resourceState/context": [
+                {
+                    "command": "extension.openinperforce.resource",
+                    "when": "scmProvider == perforce && scmResourceState =~ /opened/ || scmResourceState =~ /shelved/"
+                },
+                {
+                    "command": "extension.openinperforce.resource.copy-depot-path",
+                    "when": "scmProvider == perforce && scmResourceState =~ /opened/ || scmResourceState =~ /shelved/"
+                }
+			],
+            "scm/resourceGroup/context": [
+                {
+                    "command": "extension.openinperforce.changelist.open-jira",
+                    "when": "scmProvider == perforce"
+                }
+            ]
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^3.9.9",
+        "vscode": "^1.1.37",
+        "@types/node": "^16.6.1",
+        "@types/mocha": "^2.2.42"
+    }
+}

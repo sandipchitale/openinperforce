@@ -1,0 +1,10 @@
+.vscode/**
+.vscode-test/**
+out/test/**
+out/**/*.map
+src/**
+local/**
+.gitignore
+tsconfig.json
+openinperforce-*.vsix
+vsc-extension-quickstart.md
