@@ -4,19 +4,38 @@
 import * as vscode from "vscode";
 import * as path from "path";
 import * as fs from "fs";
+import * as os from "os";
+import * as dns from "dns";
 import * as child_process from "child_process";
 import { ExecException } from "child_process";
 
 let openinperforceExecutable = "openinperforce.exe";
+let domain;
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+
+    // If remote schitale.vscode-perforce-teamcity-remoterun extension is installed hide extension.openinperforce.changelist.open-jira command
+    vscode.commands.executeCommand('setContext', 'open-jira', !!vscode.extensions.getExtension('schitale.vscode-perforce-teamcity-remoterun'))
+
     if (process.platform === "win32") {
         openinperforceExecutable = path.join(
             context.extensionPath,
             openinperforceExecutable
         );
+    }
+
+    // Detect opentext intranet
+    const host = await dns.promises.lookup(os.hostname(), { family: 4 });
+    if (host) {
+        const hostFQDNs = await dns.promises.reverse(host.address);
+        if (hostFQDNs && hostFQDNs.length > 0) {
+            const firstHostFQDN = hostFQDNs[0];
+            if (firstHostFQDN.includes('.opentext.')) {
+                domain = 'opentext.com';
+            }
+        }
     }
 
     context.subscriptions.push(vscode.commands.registerCommand("extension.openinperforce", openInPerforce));
@@ -26,6 +45,11 @@ export function activate(context: vscode.ExtensionContext) {
 }
 
 function openJIRA(target: any) {
+    if (vscode.extensions.getExtension('schitale.vscode-perforce-teamcity-remoterun')) {
+        // Back off
+        vscode.window.showWarningMessage('Redundant. 👋');
+        return;
+    }
     const changelistDescription: string = target.v?.trim();
     if (changelistDescription) {
         const config = vscode.workspace.getConfiguration("openinperforce");
@@ -35,9 +59,16 @@ function openJIRA(target: any) {
         }
         const matches = new RegExp(jiraIdRegexpPattern, 'g').exec(changelistDescription);
         if (matches && matches.length > 0) {
-            let jiraUrlTemplate = 'https://jira.opentext.com/browse/{JIRA-ID}';
+            let jiraUrlTemplate = 'https://jira.{DOMAIN-SUFFIX}/browse/{JIRA-ID}';
             if (config && config.jiraUrlTemplate) {
                 jiraUrlTemplate = config.jiraUrlTemplate;
+                if (jiraUrlTemplate.includes('{DOMAIN-SUFFIX}')) {
+                    if (!domain) {
+                        vscode.window.showErrorMessage(`Configure the {DOMAIN-SUFFIX} and the rest in '${jiraUrlTemplate}'\ntemplate with correct DNS domain in settings to point to your JIRA.`);
+                        return;
+                    }
+                    jiraUrlTemplate = jiraUrlTemplate.replace('{DOMAIN-SUFFIX}', domain);
+                }
             }
             vscode.env.openExternal(vscode.Uri.parse(jiraUrlTemplate.replace('{JIRA-ID}', matches[0])));
         }

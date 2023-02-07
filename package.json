@@ -3,7 +3,7 @@
     "displayName": "Open selected resource in Perforce",
     "icon": "images/icon.png",
     "description": "VS Code extention to open selected resource (file or folder) in Perforce.",
-    "version": "1.0.5",
+    "version": "1.0.6",
     "license": "SEE LICENCE IN LICENSE",
     "publisher": "sandipchitale",
     "author": {
@@ -35,7 +35,7 @@
                 },
                 "openinperforce.jiraUrlTemplate": {
                     "type": "string",
-                    "default": "https://jira.opentext.com/browse/{JIRA-ID}",
+                    "default": "https://jira.{DOMAIN-SUFFIX}/browse/{JIRA-ID}",
                     "description": "URL for JIRA. {JIRA-ID} will be replaced by matched JIRA_ID"
                 },
                 "openinperforce.jiraIdRegexp": {
@@ -89,7 +89,7 @@
             "scm/resourceGroup/context": [
                 {
                     "command": "extension.openinperforce.changelist.open-jira",
-                    "when": "scmProvider == perforce"
+                    "when": "scmProvider == perforce && !open-jira"
                 }
             ]
         }
