@@ -3,7 +3,7 @@
     "displayName": "Open selected resource in Perforce",
     "icon": "images/icon.png",
     "description": "VS Code extention to open selected resource (file or folder) in Perforce.",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "license": "SEE LICENCE IN LICENSE",
     "publisher": "sandipchitale",
     "author": {
@@ -24,6 +24,7 @@
     ],
     "main": "./out/extension",
     "activationEvents": [
+        "onStartupFinished"
     ],
     "contributes": {
         "configuration": {
